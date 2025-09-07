@@ -1,0 +1,34 @@
+<?php
+$lock_file = 'lock.txt';
+$message_file = 'message.txt';
+
+// Check if locked (AJAX call from JS)
+if (isset($_GET['check'])) {
+    if (file_exists($lock_file)) {
+        echo 'locked';
+    } else {
+        echo 'open';
+    }
+    exit;
+}
+
+// Handle POST submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (file_exists($lock_file)) {
+        die("Message already received. 💌");
+    }
+
+    $msg = trim($_POST['message'] ?? '');
+    if ($msg === '') {
+        die("Empty message not allowed.");
+    }
+
+    // Save the message
+    file_put_contents($message_file, $msg);
+
+    // Lock future submissions
+    file_put_contents($lock_file, 'locked');
+
+    echo "Thanks! Your anonymous message has been received. ❤️";
+}
+?>
