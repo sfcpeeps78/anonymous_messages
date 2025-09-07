@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anonymous Message Box 💌</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      color: #fff;
+    }
+    h1 {
+      font-size: 2rem;
+      margin: 20px 0 10px;
+      text-align: center;
+    }
+    h2 {
+      margin-top: 30px;
+      font-size: 1.5rem;
+    }
+    form {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      width: 320px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease;
+    }
+    form:hover {
+      transform: scale(1.02);
+    }
+    input, textarea, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      font-size: 1rem;
+    }
+    input, textarea {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    input::placeholder, textarea::placeholder {
+      color: #ddd;
+    }
+    button {
+      background: linear-gradient(90deg, #ff6a00, #ee0979);
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      opacity: 0.9;
+      transform: scale(1.03);
+    }
+    .messages {
+      margin-top: 20px;
+      max-width: 400px;
+      width: 100%;
+    }
+    .msg {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 12px;
+      margin: 10px 0;
+      animation: fadeIn 0.5s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .msg strong {
+      display: block;
+      font-size: 0.9rem;
+      color: #ffd166;
+      margin-bottom: 5px;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <h1>💌 Send Me an Anonymous Message</h1>
+
+  <form id="msgForm">
+    <input type="text" id="name" placeholder="Your nickname (optional)">
+    <textarea id="message" rows="4" placeholder="Write your message..." required></textarea>
+    <button type="submit">🚀 Send</button>
+  </form>
+
+  <h2>✨ Messages ✨</h2>
+  <div class="messages" id="messages"></div>
+
+  <script type="module">
+    // 🔹 Replace with your Firebase project config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+      projectId: "YOUR_PROJECT",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+
+    // Initialize Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-database.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const msgRef = ref(db, "messages");
+
+    // Handle form submit
+    document.getElementById("msgForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value || "Anonymous";
+      const message = document.getElementById("message").value;
+
+      push(msgRef, {
+        name,
+        message
+      });
+
+      document.getElementById("message").value = "";
+      document.getElementById("name").value = "";
+    });
+
+    // Display messages
+    const messagesDiv = document.getElementById("messages");
+    onChildAdded(msgRef, (data) => {
+      const msg = data.val();
+      const div = document.createElement("div");
+      div.classList.add("
